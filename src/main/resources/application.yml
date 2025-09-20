@@ -1,0 +1,26 @@
+spring:
+    profiles:
+        active: dev
+    application:
+        name: "Demo"
+        version: "0.1"
+
+---
+
+spring:
+    config:
+        activate:
+            on-profile: dev
+
+server:
+    port: 8080
+
+---
+
+spring:
+    config:
+        activate:
+            on-profile: prod
+
+server:
+    port: 9001
