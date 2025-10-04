@@ -8,9 +8,20 @@ spring:
 ---
 
 spring:
+    datasource:
+        url: jdbc; postgresql://localhost:5432/shop
+        username: postgres
+        password: 
+        driver-class-name: org.postgresql.Driver
+    jpa:
+      database-platform: org.hiberrate.dialect.PostgreSQLDialect
+      hibernate: 
+        ddl-auto: update
+    
     config:
         activate:
             on-profile: dev
+    
 
 server:
     port: 8080
@@ -24,3 +35,4 @@ spring:
 
 server:
     port: 9001
+
