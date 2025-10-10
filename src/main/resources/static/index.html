@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление продуктами</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #f2f2f2;
+            --accent-color: #ff9800;
+            --danger-color: #f44336;
+            --text-color: #333;
+            --border-color: #ddd;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: var(--text-color);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-section {
+            background-color: var(--secondary-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+        
+        .btn-edit {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background-color: #e68a00;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: var(--secondary-color);
+        }
+        
+        tr:hover {
+            background-color: rgba(79, 175, 80, 0.1);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .search-section {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+        
+        .search-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .search-btn:hover {
+            background-color: #0b7dda;
+        }
+        
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Управление продуктами</h1>
+        
+        <div id="message" class="message hidden"></div>
+        
+        <div class="form-section">
+            <h2 id="form-title">Добавить новый продукт</h2>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                <div class="form-group">
+                    <label for="title">Название:</label>
+                    <input type="text" id="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="cost">Стоимость:</label>
+                    <input type="number" id="cost" min="0" step="0.01" required>
+                </div>
+                <button type="submit" class="btn-primary" id="submit-btn">Добавить</button>
+                <button type="button" class="btn-danger hidden" id="cancel-btn">Отмена</button>
+            </form>
+        </div>
+        
+        <div class="search-section">
+            <input type="text" id="search-input" class="search-input" placeholder="Поиск по названию...">
+            <button id="search-btn" class="search-btn">Поиск</button>
+            <button id="reset-search-btn" class="btn-primary">Сбросить</button>
+        </div>
+        
+        <h2>Список продуктов</h2>
+        <table id="products-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Стоимость</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="products-list">
+                <!-- Продукты будут загружены здесь -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Базовый URL API
+        const API_BASE_URL = 'http://localhost:8080';
+        
+        // DOM элементы
+        const productForm = document.getElementById('product-form');
+        const productIdInput = document.getElementById('product-id');
+        const titleInput = document.getElementById('title');
+        const costInput = document.getElementById('cost');
+        const submitBtn = document.getElementById('submit-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const productsList = document.getElementById('products-list');
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const resetSearchBtn = document.getElementById('reset-search-btn');
+        const formTitle = document.getElementById('form-title');
+        const messageDiv = document.getElementById('message');
+        
+        // Текущий режим (добавление или редактирование)
+        let isEditMode = false;
+        
+        // Загрузить продукты при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+            
+            // Обработчик отправки формы
+            productForm.addEventListener('submit', handleFormSubmit);
+            
+            // Обработчик кнопки отмены
+            cancelBtn.addEventListener('click', resetForm);
+            
+            // Обработчики поиска
+            searchBtn.addEventListener('click', () => {
+                const searchTerm = searchInput.value.trim();
+                if (searchTerm) {
+                    searchProducts(searchTerm);
+                } else {
+                    loadProducts();
+                }
+            });
+            
+            resetSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                loadProducts();
+            });
+        });
+        
+        // Функция загрузки всех продуктов
+        function loadProducts() {
+            fetch(`${API_BASE_URL}/products`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки продуктов');
+                }
+                return response.json();
+            })
+            .then(page => {
+                displayProducts(page.content);
+            })
+            .catch(error => {
+                showMessage(error.message, 'error');
+            });
+        }
+        
+        // Функция поиска продуктов
+        function searchProducts(title) {
+            fetch(`${API_BASE_URL}/products?title=${encodeURIComponent(title)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка поиска продуктов');
+                }
+                return response.json();
+            })
+            .then(page => {
+                displayProducts(page.content);
+            })
+            .catch(error => {
+                showMessage(error.message, 'error');
+            });
+        }
+        
+        // Функция отображения продуктов в таблице
+        function displayProducts(products) {
+            productsList.innerHTML = '';
+            
+            if (products.length === 0) {
+                productsList.innerHTML = '<tr><td colspan="4" style="text-align: center;">Продукты не найдены</td></tr>';
+                return;
+            }
+            
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.title}</td>
+                    <td>${product.cost} руб.</td>
+                    <td class="actions">
+                        <button class="btn-edit" onclick="editProduct(${product.id})">Изменить</button>
+                        <button class="btn-danger" onclick="deleteProduct(${product.id})">Удалить</button>
+                    </td>
+                `;
+                
+                productsList.appendChild(row);
+            });
+        }
+        
+        // Обработчик отправки формы
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const product = {
+                title: titleInput.value.trim(),
+                cost: parseFloat(costInput.value)
+            };
+            
+            if (isEditMode) {
+                updateProduct(productIdInput.value, product);
+            } else {
+                createProduct(product);
+            }
+        }
+        
+        // Функция создания продукта
+        function createProduct(product) {
+            fetch(`${API_BASE_URL}/products`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(product)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text) });
+                }
+                return response.json();
+            })
+            .then(newProduct => {
+                showMessage('Продукт успешно добавлен', 'success');
+                resetForm();
+                loadProducts();
+            })
+            .catch(error => {
+                showMessage(`Ошибка при добавлении: ${error.message}`, 'error');
+            });
+        }
+        
+        // Функция обновления продукта
+        function updateProduct(id, product) {
+            fetch(`${API_BASE_URL}/products/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(product)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text) });
+                }
+                return response.json();
+            })
+            .then(updatedProduct => {
+                showMessage('Продукт успешно обновлен', 'success');
+                resetForm();
+                loadProducts();
+            })
+            .catch(error => {
+                showMessage(`Ошибка при обновлении: ${error.message}`, 'error');
+            });
+        }
+        
+        // Функция редактирования продукта
+        function editProduct(id) {
+            fetch(`${API_BASE_URL}/products/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки продукта');
+                }
+                return response.json();
+            })
+            .then(product => {
+                productIdInput.value = product.id;
+                titleInput.value = product.title;
+                costInput.value = product.cost;
+                
+                formTitle.textContent = 'Редактировать продукт';
+                submitBtn.textContent = 'Обновить';
+                cancelBtn.classList.remove('hidden');
+                
+                isEditMode = true;
+                
+                // Прокрутка к форме
+                productForm.scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(error => {
+                showMessage(error.message, 'error');
+            });
+        }
+        
+        // Функция удаления продукта
+        function deleteProduct(id) {
+            if (!confirm('Вы уверены, что хотите удалить этот продукт?')) {
+                return;
+            }
+            
+            fetch(`${API_BASE_URL}/products/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка удаления продукта');
+                }
+                showMessage('Продукт успешно удален', 'success');
+                loadProducts();
+            })
+            .catch(error => {
+                showMessage(error.message, 'error');
+            });
+        }
+        
+        // Сброс формы
+        function resetForm() {
+            productForm.reset();
+            productIdInput.value = '';
+            
+            formTitle.textContent = 'Добавить новый продукт';
+            submitBtn.textContent = 'Добавить';
+            cancelBtn.classList.add('hidden');
+            
+            isEditMode = false;
+        }
+        
+        // Показать сообщение
+        function showMessage(message, type) {
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.classList.remove('hidden');
+            
+            // Автоматическое скрытие сообщения через 5 секунд
+            setTimeout(() => {
+                messageDiv.classList.add('hidden');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

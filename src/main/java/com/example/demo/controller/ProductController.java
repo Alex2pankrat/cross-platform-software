@@ -11,6 +11,9 @@ import com.example.demo.service.ProductService;
 
 import jakarta.validation.Valid;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -39,13 +42,19 @@ public class ProductController {
 
 
     @GetMapping("/products")
-    public List<Product> getProducts(@RequestParam(required = false) String title) {
+    public ResponseEntity<Object> getProducts(@RequestParam(required = false) String title, 
+                                        @RequestParam(required = false) Integer minCost, 
+                                        @RequestParam(required = false) Integer maxCost,
+                                        @PageableDefault(page=0, size=5, sort="title") Pageable pageable) {
         
-        if (title == null){
-            return productService.getAll();
-        }
-        return productService.getByTitle(title);
+        Page<Product> productPage = productService.getByFilter(title, minCost, maxCost, pageable);
+        return ResponseEntity.ok(productPage);
+        // if (title == null){
+        //     return productService.getAll();
+        // }
+        // return productService.getByTitle(title);
     }
+  
     
     @PostMapping("/products")
     public ResponseEntity<Product> postProducts(@RequestBody @Valid Product product) {

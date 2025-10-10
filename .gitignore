@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Custom ignores
+# Ignore environment-specific configuration files
+/src/main/resources/application.yml
