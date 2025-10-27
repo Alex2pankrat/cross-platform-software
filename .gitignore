@@ -35,3 +35,4 @@ build/
 # Custom ignores
 # Ignore environment-specific configuration files
 /src/main/resources/application.yml
+/src/test/resources/application.yml

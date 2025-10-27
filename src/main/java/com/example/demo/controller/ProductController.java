@@ -43,8 +43,8 @@ public class ProductController {
 
     @GetMapping("/products")
     public ResponseEntity<Object> getProducts(@RequestParam(required = false) String title, 
-                                        @RequestParam(required = false) Integer minCost, 
-                                        @RequestParam(required = false) Integer maxCost,
+                                        @RequestParam(required = false) int minCost, 
+                                        @RequestParam(required = false) int maxCost,
                                         @PageableDefault(page=0, size=5, sort="title") Pageable pageable) {
         
         Page<Product> productPage = productService.getByFilter(title, minCost, maxCost, pageable);

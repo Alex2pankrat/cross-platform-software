@@ -280,8 +280,8 @@
                 }
                 return response.json();
             })
-            .then(page => {
-                displayProducts(page.content);
+            .then(products => {
+                displayProducts(products);
             })
             .catch(error => {
                 showMessage(error.message, 'error');
@@ -302,8 +302,8 @@
                 }
                 return response.json();
             })
-            .then(page => {
-                displayProducts(page.content);
+            .then(products => {
+                displayProducts(products);
             })
             .catch(error => {
                 showMessage(error.message, 'error');

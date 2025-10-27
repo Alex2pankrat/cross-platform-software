@@ -70,13 +70,13 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public Page<Product> getByFilter(String title, Integer minCost, Integer maxCost, Pageable pageable){
+    public Page<Product> getByFilter(String title, int minCost, int maxCost, Pageable pageable){
         return productRepository.findAll(ProductSpecification.withFilter(title,minCost,maxCost), pageable);
     }
 
     // @PostConstruct
     // public void init(){
-    //     create(new Product(null, "ааа", 1000));
+    //     create(new Product(null, "Кефир", 123));
         
     // }
 }
